@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "R2QdrW97UKHfFS0LUSQEYcYVitcPppPMp7WLUL2Xotw=",
+  "Source": "MesaApi",
+  "BasePath": "_content/MesaApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

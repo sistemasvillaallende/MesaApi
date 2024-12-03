@@ -477,7 +477,6 @@ namespace MesaApi.Entities
                 oMExp.fojas = oExp.Fojas;
                 Movimientos_expediente.Inserto1erMovimiento(oMExp, cn, trx);
                 trx.Commit();
-
             }
             catch (Exception ex)
             {

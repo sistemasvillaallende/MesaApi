@@ -6,6 +6,8 @@ namespace MesaApi.Services
     public interface IExpedienteServices
     {
         public void NuevoExpediente(Expediente oExp);
-       
+        public int NuevoExpedienteConRetorno(Expediente oExp);
+
+
     }
 }

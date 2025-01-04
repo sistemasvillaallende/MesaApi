@@ -15,6 +15,7 @@ namespace MesaApi.Services
                     try
                     {
                         Expediente.NuevoExpediente(oExp, con, tran, 1);
+                        tran.Commit();
                     }
                     catch (Exception)
                     {
@@ -24,16 +25,27 @@ namespace MesaApi.Services
             }
         }
 
-        public List<Tipos_usos_lote> ListarUsosLote()
+        public int NuevoExpedienteConRetorno(Expediente oExp)
         {
-            try
-            {
-                return 
-            }
-            catch (Exception)
-            {
 
-                throw;
+            using (SqlConnection con = DALBase.GetConnection())
+            {
+                int retorno = 0;
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        retorno = Expediente.NuevoExpedienteConRetorno(oExp, con, tran, 1);
+                        tran.Commit();
+                        return retorno;
+
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                }
             }
 
         }

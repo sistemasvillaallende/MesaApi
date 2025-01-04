@@ -460,29 +460,136 @@ namespace MesaApi.Entities
                 //cmdInsert.Parameters.AddWithValue("@tieneadjunto", oExp.tieneadjunto);
                 cmdInsert.ExecuteNonQuery();
                 //3er paso
-                oMExp = new Movimientos_expediente();
-                oMExp.anio = oExp.Anio;
-                oMExp.nro_expediente = oExp.Nro_expediente;
-                oMExp.nro_paso = 0;
-                oMExp.cod_estado_expediente = oExp.Cod_estado_expediente;//Pase de oficina
-                oMExp.codigo_oficina_origen = oExp.Cod_oficina_origen;
-                oMExp.codigo_oficina_destino = oExp.Cod_oficina_destino;
-                oMExp.fecha_pase = DateTime.Today;
-                //objMovimiento.fecha_recepcion = "";
-                //objMovimiento.fecha_vencimiento = "";
-                oMExp.observaciones = oExp.Observaciones;
-                oMExp.atendido = false;//pongo en 0 pq todavia no esta atendido
-                oMExp.usuario = oExp.Usuario ?? "";
-                oMExp.dias_sin_resolver = 0;
-                oMExp.fojas = oExp.Fojas;
+                //inserto el 1er movimiento
+                oMExp = new Movimientos_expediente
+                {
+                    anio = oExp.Anio,
+                    nro_expediente = oExp.Nro_expediente,
+                    nro_paso = 0,
+                    cod_estado_expediente = oExp.Cod_estado_expediente,
+                    codigo_oficina_origen = oExp.Cod_oficina_origen,
+                    codigo_oficina_destino = oExp.Cod_oficina_destino,
+                    fecha_pase = DateTime.Today,
+                    observaciones = oExp.Observaciones,
+                    atendido = false,
+                    usuario = oExp.Usuario ?? "",
+                    dias_sin_resolver = 0,
+                    fojas = oExp.Fojas
+                };
                 Movimientos_expediente.Inserto1erMovimiento(oMExp, cn, trx);
-                trx.Commit();
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message + " Error en la insercion!!!");
             }
         }
+
+
+        public static int NuevoExpedienteConRetorno(Expediente oExp, SqlConnection cn, SqlTransaction trx, int opcion)
+        {
+            StringBuilder strInsert = new StringBuilder();
+            int aux_nro_expediente = 0;
+            int aux_nro_expediente_base = GetNroExpediente();
+            Movimientos_expediente oMExp;
+
+            try
+            {
+                string SQL = @"SELECT ISNULL(max(nro_expediente),0) as nro_expediente 
+                       FROM EXPEDIENTE WHERE anio=@anio";
+
+                // 1er
+                SqlCommand cmd = cn.CreateCommand();
+                cmd.Transaction = trx;
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = SQL;
+                cmd.Parameters.AddWithValue("@anio", oExp.Anio);
+                aux_nro_expediente = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
+
+                // Si es el primer registro del año
+                // Seteo por defecto a 10001 o en base al nro de expediente parametro
+                if (aux_nro_expediente == 1)
+                    aux_nro_expediente = aux_nro_expediente_base;
+
+                oExp.Nro_expediente = aux_nro_expediente;
+
+                // Doy de Alta o Actualizo Persona segun corresponda
+                if (opcion == 0)
+                    Persona.InsertPersona(oExp.objPersona, cn, trx);
+                else
+                    Persona.UpdatePersona(oExp.objPersona, cn, trx);
+
+                // 2do
+                strInsert.AppendLine("insert into Expediente");
+                strInsert.AppendLine("(anio, nro_expediente, fecha_alta_registro, fecha_ingreso, id_persona, " +
+                    "nombre, cod_tipo_tramite, cod_asunto, cod_oficina_origen, cod_oficina_destino, cod_estado_expediente, " +
+                    "observaciones, pase, anulado, ejecutado, email, usuario, celular, cuit, fojas, anio_padre, nro_expediente_padre, " +
+                    "atendido, nro_anexo)");
+                strInsert.AppendLine("VALUES");
+                strInsert.AppendLine("(@anio, @nro_expediente, @fecha_alta_registro, @fecha_ingreso, @id_persona, " +
+                    "@nombre, @cod_tipo_tramite, @cod_asunto, @cod_oficina_origen, @cod_oficina_destino, @cod_estado_expediente, " +
+                    "@observaciones, @pase, @anulado, @ejecutado, @email, @usuario, @celular, @cuit, @fojas, @anio_padre, @nro_expediente_padre," +
+                    " @atendido, @nro_anexo)");
+
+                SqlCommand cmdInsert = cn.CreateCommand();
+                cmdInsert.Transaction = trx;
+                cmdInsert.CommandType = CommandType.Text;
+                cmdInsert.CommandText = strInsert.ToString();
+
+                cmdInsert.Parameters.AddWithValue("@anio", oExp.Anio);
+                cmdInsert.Parameters.AddWithValue("@nro_expediente", oExp.Nro_expediente);
+                cmdInsert.Parameters.AddWithValue("@fecha_alta_registro", oExp.Fecha_alta_registro);
+                cmdInsert.Parameters.AddWithValue("@fecha_ingreso", oExp.Fecha_ingreso);
+                cmdInsert.Parameters.AddWithValue("@id_persona", oExp.objPersona.id_persona);
+                cmdInsert.Parameters.AddWithValue("@nombre", oExp.objPersona.nombre ?? (object)DBNull.Value);
+                cmdInsert.Parameters.AddWithValue("@cod_tipo_tramite", oExp.Cod_tipo_tramite);
+                cmdInsert.Parameters.AddWithValue("@cod_asunto", oExp.Cod_asunto);
+                cmdInsert.Parameters.AddWithValue("@cod_oficina_origen", oExp.Cod_oficina_origen);
+                cmdInsert.Parameters.AddWithValue("@cod_oficina_destino", oExp.Cod_oficina_destino);
+                cmdInsert.Parameters.AddWithValue("@cod_estado_expediente", oExp.Cod_estado_expediente);
+                cmdInsert.Parameters.AddWithValue("@observaciones", oExp.Observaciones ?? (object)DBNull.Value);
+                cmdInsert.Parameters.AddWithValue("@pase", oExp.Pase);
+                cmdInsert.Parameters.AddWithValue("@anulado", oExp.Anulado);
+                cmdInsert.Parameters.AddWithValue("@ejecutado", oExp.Ejecutado);
+                cmdInsert.Parameters.AddWithValue("@email", oExp.Email);
+                cmdInsert.Parameters.AddWithValue("@usuario", oExp.Usuario ?? (object)DBNull.Value);
+                cmdInsert.Parameters.AddWithValue("@celular", oExp.Celular ?? (object)DBNull.Value);
+                cmdInsert.Parameters.AddWithValue("@cuit", oExp.objPersona.cuit);
+                cmdInsert.Parameters.AddWithValue("@fojas", oExp.Fojas);
+                cmdInsert.Parameters.AddWithValue("@anio_padre", oExp.Anio_padre);
+                cmdInsert.Parameters.AddWithValue("@nro_expediente_padre", oExp.Nro_expediente_padre);
+                cmdInsert.Parameters.AddWithValue("@atendido", oExp.Atendido);
+                cmdInsert.Parameters.AddWithValue("@nro_anexo", oExp.Nro_anexo);
+
+                cmdInsert.ExecuteNonQuery();
+
+                // 3er paso
+                // inserto el 1er movimiento
+                oMExp = new Movimientos_expediente
+                {
+                    anio = oExp.Anio,
+                    nro_expediente = oExp.Nro_expediente,
+                    nro_paso = 0,
+                    cod_estado_expediente = oExp.Cod_estado_expediente,
+                    codigo_oficina_origen = oExp.Cod_oficina_origen,
+                    codigo_oficina_destino = oExp.Cod_oficina_destino,
+                    fecha_pase = DateTime.Today,
+                    observaciones = oExp.Observaciones,
+                    atendido = false,
+                    usuario = oExp.Usuario ?? "",
+                    dias_sin_resolver = 0,
+                    fojas = oExp.Fojas
+                };
+
+                Movimientos_expediente.Inserto1erMovimiento(oMExp, cn, trx);
+                // Retorno el nro_expediente y anio combinados como entero
+                return int.Parse($"{oExp.Nro_expediente}{oExp.Anio}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + " Error en la inserción, metodo NuevoExpedienteConRetorno!!!");
+            }
+        }
+
 
         public static void update(Expediente obj)
         {

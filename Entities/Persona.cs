@@ -54,7 +54,103 @@ namespace MesaApi.Entities
         }
 
 
+        public static Entities.Persona GetByPk(string cuit, SqlConnection cn, SqlTransaction trx)
+        {
+            Entities.Persona objPersona = new Entities.Persona();
+            SqlCommand cmd;
+            SqlDataReader dr;
 
+            string strSQL = @" SELECT * FROM Personas WHERE LTRIM(RTRIM(cuit)) = @cuit";
+
+            try
+            {
+                cmd = cn.CreateCommand();
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = strSQL.ToString();
+                cmd.Transaction = trx;
+                cmd.Parameters.Add(new SqlParameter("@cuit", cuit.Trim()));
+
+                dr = cmd.ExecuteReader();
+
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("id_persona")))
+                            objPersona.id_persona = dr.GetInt32((dr.GetOrdinal("id_persona")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cuit")))
+                            objPersona.cuit = dr.GetString((dr.GetOrdinal("cuit")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cod_tipo_documento")))
+                            objPersona.cod_tipo_documento = dr.GetInt32((dr.GetOrdinal("cod_tipo_documento")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("nro_documento")))
+                            objPersona.nro_documento = dr.GetString((dr.GetOrdinal("nro_documento")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("fecha_alta_registro")))
+                            objPersona.fecha_alta_registro = Convert.ToDateTime(dr["fecha_alta_registro"]).ToString("dd/MM/yyyy");
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("sexo")))
+                            objPersona.sexo = dr.GetString((dr.GetOrdinal("sexo")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("fecha_nacimiento")))
+                            objPersona.fecha_nacimiento = Convert.ToDateTime(dr["fecha_nacimiento"]).ToString("dd/MM/yyyy");
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cod_estado_civil")))
+                            objPersona.cod_estado_civil = dr.GetInt32((dr.GetOrdinal("cod_estado_civil")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("nombre")))
+                            objPersona.nombre = dr.GetString(dr.GetOrdinal("nombre"));
+
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("tel_particular")))
+                            objPersona.tel_particular = dr.GetString((dr.GetOrdinal("tel_particular")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("tel_celular")))
+                            objPersona.tel_celular = dr.GetString((dr.GetOrdinal("tel_celular")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("nom_calle")))
+                            objPersona.nom_calle = dr.GetString((dr.GetOrdinal("nom_calle")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("nro_domicilio")))
+                            objPersona.nro_domicilio = dr.GetString((dr.GetOrdinal("nro_domicilio")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("nom_barrio")))
+                            objPersona.nom_barrio = dr.GetString((dr.GetOrdinal("nom_barrio")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cod_postal")))
+                            objPersona.cod_postal = dr.GetString((dr.GetOrdinal("cod_postal")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("ciudad")))
+                            objPersona.ciudad = dr.GetString((dr.GetOrdinal("ciudad")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("provincia")))
+                            objPersona.provincia = dr.GetString((dr.GetOrdinal("provincia")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cod_tipo_contacto")))
+                            objPersona.cod_tipo_contacto = dr.GetInt32((dr.GetOrdinal("cod_tipo_contacto")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("cod_tipo_actividad")))
+                            objPersona.cod_tipo_actividad = dr.GetInt32((dr.GetOrdinal("cod_tipo_actividad")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("observaciones")))
+                            objPersona.observaciones = dr.GetString((dr.GetOrdinal("observaciones")));
+
+                        if (!dr.IsDBNull(dr.GetOrdinal("email")))
+                            objPersona.email = dr.GetString((dr.GetOrdinal("email")));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error in query!" + e.ToString());
+                throw;
+            }
+            dr.Close();
+            return objPersona;
+        }
         public static void InsertPersona(Entities.Persona oPer, SqlConnection cn, SqlTransaction trx)
         {
 
@@ -156,8 +252,6 @@ namespace MesaApi.Entities
             }
 
         }
-
-
         public static void UpdatePersona(Entities.Persona oPer, SqlConnection cn, SqlTransaction trx)
         {
 

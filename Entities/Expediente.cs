@@ -338,29 +338,13 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
-        public static int GetNroExpediente()
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            int nroExpediente = configuration.GetValue<int>("nro_expediente_base");
-            return nroExpediente;
-        }
-
-        //public static void NuevoExpediente(Entities.Expediente oExp, Entities.Persona oPer,
-        // SqlConnection cn, SqlTransaction trx, int opcion)
-        //aux_nro_expediente_base = 
-        //Convert.ToInt16(ConfigurationManager.AppSettings["Nro_expediente_base"]);
-        public static void NuevoExpediente(Expediente oExp, SqlConnection cn, SqlTransaction trx, int opcion)
+        public static void NuevoExpediente(Expediente oExp, SqlConnection cn, SqlTransaction trx)
         {
             StringBuilder strInsert = new StringBuilder();
             int aux_nro_expediente = 0;
             int aux_nro_expediente_base = 0;
             //levanto el parametro del nro base de expediente
-            aux_nro_expediente_base = GetNroExpediente();
+            aux_nro_expediente_base = 10001;
             Movimientos_expediente oMExp;
             try
             {
@@ -379,8 +363,10 @@ namespace MesaApi.Entities
                 if (aux_nro_expediente == 1)
                     aux_nro_expediente = aux_nro_expediente_base;
                 oExp.Nro_expediente = aux_nro_expediente;
-                //Doy de Alta o Actualizo Persona segun corresponda
-                if (opcion == 0)
+                oExp.objPersona = Persona.GetByPk(oExp.Cuit.ToString(), cn, trx);
+
+                // Doy de Alta o Actualizo Persona segun corresponda
+                if (oExp.objPersona.id_persona == 0)
                     Persona.InsertPersona(oExp.objPersona, cn, trx);
                 else
                     Persona.UpdatePersona(oExp.objPersona, cn, trx);
@@ -483,13 +469,11 @@ namespace MesaApi.Entities
                 throw new Exception(ex.Message + " Error en la insercion!!!");
             }
         }
-
-
-        public static int NuevoExpedienteConRetorno(Expediente oExp, SqlConnection cn, SqlTransaction trx, int opcion)
+        public static int NuevoExpedienteConRetorno(Expediente oExp, SqlConnection cn, SqlTransaction trx)
         {
             StringBuilder strInsert = new StringBuilder();
             int aux_nro_expediente = 0;
-            int aux_nro_expediente_base = GetNroExpediente();
+            int aux_nro_expediente_base = 10001;
             Movimientos_expediente oMExp;
 
             try
@@ -512,8 +496,10 @@ namespace MesaApi.Entities
 
                 oExp.Nro_expediente = aux_nro_expediente;
 
+                oExp.objPersona = Persona.GetByPk(oExp.Cuit.ToString(), cn, trx);
+
                 // Doy de Alta o Actualizo Persona segun corresponda
-                if (opcion == 0)
+                if (oExp.objPersona.id_persona == 0)
                     Persona.InsertPersona(oExp.objPersona, cn, trx);
                 else
                     Persona.UpdatePersona(oExp.objPersona, cn, trx);
@@ -589,8 +575,6 @@ namespace MesaApi.Entities
                 throw new Exception(ex.Message + " Error en la inserción, metodo NuevoExpedienteConRetorno!!!");
             }
         }
-
-
         public static void update(Expediente obj)
         {
             try
@@ -672,7 +656,6 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
         public static void delete(Expediente obj)
         {
             try

@@ -10,12 +10,12 @@ namespace MesaApi.Services
             using (SqlConnection con = DALBase.GetConnection())
             {
                 con.Open();
-                using (SqlTransaction tran = con.BeginTransaction())
+                using (SqlTransaction trx = con.BeginTransaction())
                 {
                     try
                     {
-                        Expediente.NuevoExpediente(oExp, con, tran, 1);
-                        tran.Commit();
+                        Expediente.NuevoExpediente(oExp, con, trx);
+                        trx.Commit();
                     }
                     catch (Exception)
                     {
@@ -27,17 +27,16 @@ namespace MesaApi.Services
 
         public int NuevoExpedienteConRetorno(Expediente oExp)
         {
-
             using (SqlConnection con = DALBase.GetConnection())
             {
                 int retorno = 0;
                 con.Open();
-                using (SqlTransaction tran = con.BeginTransaction())
+                using (SqlTransaction trx = con.BeginTransaction())
                 {
                     try
                     {
-                        retorno = Expediente.NuevoExpedienteConRetorno(oExp, con, tran, 1);
-                        tran.Commit();
+                        retorno = Expediente.NuevoExpedienteConRetorno(oExp, con, trx);
+                        trx.Commit();
                         return retorno;
 
                     }

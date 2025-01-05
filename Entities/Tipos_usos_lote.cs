@@ -14,7 +14,7 @@ namespace MesaApi.Entities
             try
             {
                 List<Tipos_usos_lote> lst = new List<Tipos_usos_lote>();
-                using (SqlConnection con = GetConnection())
+                using (SqlConnection con = GetConnectionSIIMVA())
                 {
                     SqlCommand cmd = con.CreateCommand();
                     cmd.CommandType = CommandType.Text;

@@ -78,7 +78,7 @@ namespace MesaApi.Entities
             try
             {
                 List<Expedientes_catastro> lst = new List<Expedientes_catastro>();
-                using (SqlConnection con = GetConnection())
+                using (SqlConnection con = GetConnectionSIIMVA())
                 {
                     SqlCommand cmd = con.CreateCommand();
                     cmd.CommandType = CommandType.Text;
@@ -94,7 +94,6 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
         public static Expedientes_catastro getByPk(int Nro_expediente)
         {
             try
@@ -103,7 +102,7 @@ namespace MesaApi.Entities
                 sql.AppendLine("SELECT *FROM Expedientes_catastro WHERE");
                 sql.AppendLine("Nro_expediente = @Nro_expediente");
                 Expedientes_catastro obj = null;
-                using (SqlConnection con = GetConnection())
+                using (SqlConnection con = GetConnectionSIIMVA())
                 {
                     SqlCommand cmd = con.CreateCommand();
                     cmd.CommandType = CommandType.Text;
@@ -122,7 +121,6 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
         public static void insertExpedientecatastro(Expedientes_catastro obj, SqlConnection con, SqlTransaction trx)
         {
             try
@@ -195,10 +193,6 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
-
-
-
         public static void update(Expedientes_catastro obj)
         {
             try
@@ -217,7 +211,7 @@ namespace MesaApi.Entities
                 sql.AppendLine(", Sup_edificada=@Sup_edificada");
                 sql.AppendLine("WHERE");
                 sql.AppendLine("Nro_expediente=@Nro_expediente");
-                using (SqlConnection con = GetConnection())
+                using (SqlConnection con = GetConnectionSIIMVA())
                 {
                     SqlCommand cmd = con.CreateCommand();
                     cmd.CommandType = CommandType.Text;
@@ -242,7 +236,6 @@ namespace MesaApi.Entities
                 throw ex;
             }
         }
-
         public static void delete(Expedientes_catastro obj)
         {
             try
@@ -251,7 +244,7 @@ namespace MesaApi.Entities
                 sql.AppendLine("DELETE  Expedientes_catastro ");
                 sql.AppendLine("WHERE");
                 sql.AppendLine("Nro_expediente=@Nro_expediente");
-                using (SqlConnection con = GetConnection())
+                using (SqlConnection con = GetConnectionSIIMVA())
                 {
                     SqlCommand cmd = con.CreateCommand();
                     cmd.CommandType = CommandType.Text;

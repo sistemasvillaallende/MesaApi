@@ -23,7 +23,7 @@ namespace MesaApi.Services
         {
             try
             {
-                using SqlConnection con = DALBase.GetConnection();
+                using SqlConnection con = DALBase.GetConnectionSIIMVA();
                 con.Open();
                 using (SqlTransaction trx = con.BeginTransaction())
                 {

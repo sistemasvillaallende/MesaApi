@@ -368,8 +368,8 @@ namespace MesaApi.Entities
                 // Doy de Alta o Actualizo Persona segun corresponda
                 if (oExp.objPersona.id_persona == 0)
                     Persona.InsertPersona(oExp.objPersona, cn, trx);
-                else
-                    Persona.UpdatePersona(oExp.objPersona, cn, trx);
+                //else
+                    //Persona.UpdatePersona(oExp.objPersona, cn, trx);
                 //2do
                 strInsert.AppendLine("insert into Expediente");
                 strInsert.AppendLine("(anio,");
